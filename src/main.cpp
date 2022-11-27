@@ -1,88 +1,110 @@
-//#include <iostream>
-//
-//int main()
-//{
-//    std::cout << "hi!" << std::endl;
-//}
-
-// wxWidgets "Hello World" Program
-
-// For compilers that support precompilation, includes "wx/wx.h".
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
+#ifndef UNICODE
+#define UNICODE
 #endif
 
-class MyApp : public wxApp
+#define BTN_TEST 0
+
+#include <windows.h>
+#include <iostream>
+
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-public:
-    virtual bool OnInit();
-};
+    // Register the window class.
+    const wchar_t CLASS_NAME[]  = L"BLA";
 
-class MyFrame : public wxFrame
-{
-public:
-    MyFrame();
+    WNDCLASS wc = { };
 
-private:
-    void OnHello(wxCommandEvent& event);
-    void OnExit(wxCommandEvent& event);
-    void OnAbout(wxCommandEvent& event);
-};
+    wc.lpfnWndProc   = WindowProc;
+    wc.hInstance     = hInstance;
+    wc.lpszClassName = CLASS_NAME;
 
-enum
-{
-    ID_Hello = 1
-};
+    RegisterClass(&wc);
 
-wxIMPLEMENT_APP(MyApp);
+    // Create the window.
 
-bool MyApp::OnInit()
-{
-    MyFrame *frame = new MyFrame();
-    frame->Show(true);
-    return true;
+    HWND hwnd = CreateWindowEx(
+            0, // Optional window styles.
+            CLASS_NAME, // Window class
+            L"BLA1", // Window text
+            WS_OVERLAPPEDWINDOW, // Window style
+
+            // Size and position
+            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+
+            NULL, // Parent window
+            NULL, // Menu
+            hInstance, // Instance handle
+            NULL // Additional application data
+    );
+
+    if (hwnd == NULL)
+    {
+        return 0;
+    }
+
+    ShowWindow(hwnd, nCmdShow);
+
+    HWND hwndButton = CreateWindow(
+            L"BUTTON",  // Predefined class; Unicode assumed
+            L"OK",      // Button text
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles
+            10,         // x position
+            10,         // y position
+            100,        // Button width
+            40,        // Button height
+            hwnd,     // Parent window
+            (HMENU) BTN_TEST,       // No menu.
+            (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
+            NULL);      // Pointer not needed.
+
+    // Run the message loop.
+
+    MSG msg = { };
+    while (GetMessage(&msg, NULL, 0, 0) > 0)
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
 }
 
-MyFrame::MyFrame()
-        : wxFrame(nullptr, wxID_ANY, "Hello World")
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    wxMenu *menuFile = new wxMenu;
-    menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
-                     "Help string shown in status bar for this menu item");
-    menuFile->AppendSeparator();
-    menuFile->Append(wxID_EXIT);
+    switch (uMsg)
+    {
+        case WM_COMMAND:
+            switch (LOWORD(wParam)) {
+                case BTN_TEST:
+                    SetWindowTextA(hwnd, "BATTAN");
+                    return 0;
+            }
+        case WM_LBUTTONDOWN:
+            SetWindowTextA(hwnd, "You clicked the button");
+            std::cout << "t";
+            return 0;
+        case WM_MOVING:
+            std::cout << "t";
+            return 0;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
 
-    wxMenu *menuHelp = new wxMenu;
-    menuHelp->Append(wxID_ABOUT);
+        case WM_PAINT:
+        {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
 
-    wxMenuBar *menuBar = new wxMenuBar;
-    menuBar->Append(menuFile, "&File");
-    menuBar->Append(menuHelp, "&Help");
+            // All painting occurs here, between BeginPaint and EndPaint.
 
-    SetMenuBar( menuBar );
+            FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW+1));
 
-    CreateStatusBar();
-    SetStatusText("Welcome to wxWidgets!");
+            EndPaint(hwnd, &ps);
+        }
+            return 0;
 
-    Bind(wxEVT_MENU, &MyFrame::OnHello, this, ID_Hello);
-    Bind(wxEVT_MENU, &MyFrame::OnAbout, this, wxID_ABOUT);
-    Bind(wxEVT_MENU, &MyFrame::OnExit, this, wxID_EXIT);
-}
-
-void MyFrame::OnExit(wxCommandEvent& event)
-{
-    Close(true);
-}
-
-void MyFrame::OnAbout(wxCommandEvent& event)
-{
-    wxMessageBox("This is a wxWidgets Hello World example",
-                 "About Hello World", wxOK | wxICON_INFORMATION);
-}
-
-void MyFrame::OnHello(wxCommandEvent& event)
-{
-    wxLogMessage("Hello world from wxWidgets!");
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

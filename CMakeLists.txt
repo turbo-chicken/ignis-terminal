@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(src)
 
 #add_subdirectory(external/wxWidgets/3.2.1)
+add_subdirectory(external/putty/0.78)
 
 
 #find_package(wxWidgets REQUIRED gl core base OPTIONAL_COMPONENTS net)
@@ -17,7 +18,7 @@ include_directories(src)
 #target_compile_options(ignis_terminal PRIVATE ${wxWidgets_CXX_FLAGS})
 #target_link_libraries(ignis_terminal ${wxWidgets_LIBRARIES})
 
-add_executable(ignis_terminal
+add_executable(ignis_terminal WIN32
         src/main.cpp)
 
 #target_link_libraries(ignis_terminal ${wxWidgets_LIBRARIES})
