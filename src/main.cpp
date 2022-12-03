@@ -1,3 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <time.h>
+#include <limits.h>
+#include <assert.h>
+#include <wchar.h>
+
+#define COMPILE_MULTIMON_STUBS
+
+//#include "putty.h"
+//#include "ssh.h"
+//#include "terminal.h"
+//#include "storage.h"
+//#include "putty-rc.h"
+//#include "security-api.h"
+//#include "win-gui-seat.h"
+//#include "tree234.h"
+
+
 #ifndef UNICODE
 #define UNICODE
 #endif
